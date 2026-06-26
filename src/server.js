@@ -36,7 +36,11 @@ connectDB
   })
   .catch((err) => {
     console.log("Error while creating table ", err);
-  }); 
+  });
+
+//API's Listing
+app.use("/v1/player",require('./routes/player/player.route'))
+app.use("/v1/wallets", require("./routes/wallets/wallets.route"));
 
 app.listen(PORT, () => {
   console.log(`Server is listening at ${PORT}`);
