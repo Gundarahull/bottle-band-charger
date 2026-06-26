@@ -6,7 +6,6 @@ const Player = connectDB.define(
   {
     id: {
       type: DataTypes.STRING,
-      autoIncrement: true,
       primaryKey: true,
     },
     name: {

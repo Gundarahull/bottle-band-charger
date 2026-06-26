@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const connectDB = require("../config/dbConfig");
 
 const Wallet = connectDB.define(
@@ -34,8 +34,9 @@ const Wallet = connectDB.define(
     indexes: [
       {
         name: "wallet_balance_check",
+        fields: ["balance"],
         where: {
-          balance: { [DataTypes.Op.gte]: 0 },
+          balance: { [Op.gt]: 0 }, 
         },
       },
     ],

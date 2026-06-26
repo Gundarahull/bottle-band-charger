@@ -1,4 +1,4 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes,Op } = require("sequelize");
 const connectDB = require("../config/dbConfig");
 
 const Player_Purchase_Inventory = connectDB.define(
@@ -41,8 +41,9 @@ const Player_Purchase_Inventory = connectDB.define(
     indexes: [
       {
         name: "inventory_quantity_check",
+        fields: ["quantity"],
         where: {
-          quantity: { [DataTypes.Op.gt]: 0 },
+          quantity: { [Op.gt]: 0 },
         },
       },
     ],
