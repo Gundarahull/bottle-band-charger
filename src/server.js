@@ -40,6 +40,7 @@ connectDB
 
 //API's Listing
 app.use("/v1/player",require('./routes/player/player.route'))
+app.use("/v1/inventory",require('./routes/inventory/inventory.route'))
 app.use("/v1/wallets", require("./routes/wallets/wallets.route"));
 
 app.listen(PORT, () => {

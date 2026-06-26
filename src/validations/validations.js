@@ -68,9 +68,23 @@ const validatePlayerCreation = [
     .withMessage("Name must be between 2 and 50 characters long"),
 ];
 
+const validateInventoryCreation = [
+  body("name")
+    .exists()
+    .withMessage("Item name is required")
+    .notEmpty()
+    .withMessage("Item name cannot be empty")
+    .isString()
+    .withMessage("Item name must be a valid string")
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage("Item name must be between 2 and 50 characters long"),
+];
+
 module.exports = {
   validatePlayerCredit,
   validatePlayerPurchaseItem,
   validatePlayerRewardClaim,
   validatePlayerCreation,
+  validateInventoryCreation,
 };
