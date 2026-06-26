@@ -5,6 +5,7 @@ const Done_Requests = require("../../models/doneRequests.model");
 const Wallet = require("../../models/wallet.model");
 const Inventory = require("../../models/inventory.model");
 const Player_Purchase_Inventory = require("../../models/playerPurchaseInventory.model");
+const { QueryTypes } = require("sequelize");
 
 const creditAmount = async (req, res) => {
   try {
@@ -255,7 +256,98 @@ const purchaseItem = async (req, res) => {
   }
 };
 
+const getWalletBalance = async (req, res) => {
+  try {
+    const { playerId } = req.params;
+    if (!playerId) {
+      return res.status(400).json({
+        success: false,
+        message: "Please send the PlayerID",
+      });
+    }
+    const strPlayerId = String(playerId).trim();
+
+    // RAW SQL Query to fetch rewards, inventories
+    const query = `
+      SELECT 
+        p.id AS player_id,
+        p.name as player_name,
+        COALESCE(w.balance, 0) AS balance,
+        ppi.inventory_id,
+        i.name AS item_name,
+        ppi.quantity,
+        rp.reward_id,
+        r.name AS reward_name
+      FROM players p
+      LEFT JOIN wallet w ON p.id = w.player_id
+      LEFT JOIN players_purchases_inventories ppi ON p.id = ppi.player_id
+      LEFT JOIN inventories i ON ppi.inventory_id = i.id
+      LEFT JOIN rewards_players rp ON p.id = rp.player_id
+      LEFT JOIN rewards r ON rp.reward_id = r.id
+      WHERE p.id = :playerId
+    `;
+
+    const rows = await connectDB.query(query, {
+      replacements: { playerId: strPlayerId }, //to avoid sql injections
+      type: QueryTypes.SELECT,
+    });
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Player does not exist",
+      });
+    }
+
+    const balance = Number(rows[0].balance);
+
+    const inventoryMap = new Map();
+    const uniqueRewardsMap = new Map();
+
+    for (const row of rows) {
+      //making unique for inventory
+      if (row.inventory_id) {
+        if (!inventoryMap.has(row.inventory_id)) {
+          inventoryMap.set(row.inventory_id, {
+            itemId: row.inventory_id,
+            name: row.item_name,
+            quantity: Number(row.quantity),
+          });
+        }
+      }
+
+      // making unique for Rewards
+      if (row.reward_id) {
+        if (!uniqueRewardsMap.has(row.reward_id)) {
+          uniqueRewardsMap.set(row.reward_id, {
+            rewardId: row.reward_id,
+            name: row.reward_name,
+          });
+        }
+      }
+    }
+
+    // converting maps into arrays
+    const inventoryArray = Array.from(inventoryMap.values());
+    const rewardsArray = Array.from(uniqueRewardsMap.values());
+
+    return res.status(200).json({
+      success: true,
+      balance: balance,
+      inventory: inventoryArray,
+      claimedRewards: rewardsArray,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error at getWalletBalance controller",
+      error: error.message || error,
+    });
+  }
+};
+
 module.exports = {
   creditAmount,
   purchaseItem,
+  getWalletBalance,
 };
