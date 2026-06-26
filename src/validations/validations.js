@@ -55,8 +55,22 @@ const validatePlayerRewardClaim = [
     .withMessage("PlayerId cannot be empty"),
 ];
 
+const validatePlayerCreation = [
+  body("name")
+    .exists()
+    .withMessage("Player name is required")
+    .notEmpty()
+    .withMessage("Player name cannot be empty")
+    .isString()
+    .withMessage("Player name must be a string")
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage("Name must be between 2 and 50 characters long"),
+];
+
 module.exports = {
   validatePlayerCredit,
   validatePlayerPurchaseItem,
   validatePlayerRewardClaim,
+  validatePlayerCreation,
 };
