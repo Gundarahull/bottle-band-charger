@@ -2,6 +2,7 @@ require("dotenv").config(); //configing the ENV
 const express = require("express");
 const { SERVER_PORT } = require("./config/env");
 const connectDB = require("./config/dbConfig");
+const APIVersionCheck = require("./middlewares/VersionCheck");
 const app = express();
 const PORT = SERVER_PORT;
 
@@ -14,6 +15,9 @@ app.use((req, res, next) => {
   console.log(`Request BODY : ${JSON.stringify(req.body)}`);
   next();
 });
+
+//API version Check
+app.use(APIVersionCheck("v1"));
 
 //Connecting-DATABASE
 connectDB
