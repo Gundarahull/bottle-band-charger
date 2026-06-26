@@ -173,7 +173,7 @@ const purchaseItem = async (req, res) => {
           status: 404,
           success: false,
           message: "No Money in the wallet, Please deposit ",
-          data: "Error",
+          data: null,
         };
       }
 
