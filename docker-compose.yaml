@@ -1,0 +1,29 @@
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: pg_db_conatiner
+    restart: always
+    environment:
+      POSTGRES_USER: game_admin
+      POSTGRES_PASSWORD : game@123
+      POSTGRES_DB: game_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pg_admin_conatiner
+    restart: always
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: admin@admin.in
+      PGADMIN_DEFAULT_PASSWORD : admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres_db
+
+volumes:
+  pgdata:
+    driver: local
